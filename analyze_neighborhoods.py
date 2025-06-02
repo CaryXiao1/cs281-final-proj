@@ -8,11 +8,15 @@ import sys
 
 def main():
     parser = argparse.ArgumentParser(description='Analyze neighborhood structure of admission decisions')
-    parser.add_argument('model', choices=['chatgpt', 'deepseek'], help='Choose between ChatGPT or DeepSeek model')
+    parser.add_argument('model', choices=['chatgpt', 'deepseek', 'gemini'], help='Choose between ChatGPT, DeepSeek, or Gemini model')
     args = parser.parse_args()
     
     # Select input file based on model
-    input_file = 'out.csv' if args.model == 'chatgpt' else 'out-deepseek.csv'
+    input_file = {
+        'chatgpt': 'out.csv',
+        'deepseek': 'out-deepseek.csv',
+        'gemini': 'out-gemini.csv'
+    }[args.model]
     
     # Read the CSV file
     df = pd.read_csv(input_file, header=None, names=['Race', 'Gender', 'GPA', 'ACT', 'Income', 'Location', 'School', 'Rank', 'Decision'])
@@ -27,8 +31,8 @@ def main():
     gender_cols = [col for col in df_encoded.columns if 'Gender_' in col]
 
     # Convert bools to ints and multiply by 4
-    # df_encoded[race_cols] = df_encoded[race_cols].astype(int) * 1.5
-    # df_encoded[gender_cols] = df_encoded[gender_cols].astype(int) * 1.5
+    df_encoded[race_cols] = df_encoded[race_cols].astype(int) * 1.5
+    df_encoded[gender_cols] = df_encoded[gender_cols].astype(int) * 1.5
 
     # Create binary decision column (1 for ADMIT, 0 for REJECT)
     df_encoded['Decision'] = (df_encoded['Decision'] == 'ADMIT').astype(int)
